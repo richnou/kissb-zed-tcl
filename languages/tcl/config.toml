@@ -1,0 +1,4 @@
+name = "TCL"
+grammar = "tcl"
+path_suffixes = ["tcl","kb"]
+line_comments = ["# ","#"]
