@@ -4,7 +4,7 @@ version = "0.0.1"
 schema_version = 1
 authors = ["Richnou <leys.richard@gmail.com>"]
 description = "An Extension providing TCL Language highlighting"
-repository = "https://github.com/richnou/kissb"
+repository = "https://github.com/richnou/kissb-zed-tcl"
 
 [grammars.tcl]
 repository = "https://github.com/tree-sitter-grammars/tree-sitter-tcl"
