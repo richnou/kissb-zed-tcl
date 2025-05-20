@@ -7,16 +7,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (comment) @spell @comment
-
 (command name: (simple_word) @function)
 
-"proc" @keyword.function @keyword
+
 
 (procedure
-  name: (_) @variable
+    name: (_) @function
 )
 
-(set (id) @variable)
+;(namespace) @keyword
+;(namespace . (word_list) @keyword)
+;(namespace
+;    (_): (simple_word) @function)
+
+
 
 (argument
   name: (_) @variable.parameter @variable
@@ -44,7 +48,6 @@
                 "tcl_wordchars"
                 "tcl_version"))
 
-
 "expr" @function.builtin @function
 
 ; Highlight switch arguments as string
@@ -57,8 +60,21 @@
                     name: (simple_word) @string)))
     (#eq? @keyword "switch"))
 
+;("regsub" @function.builtin @function)
+
+;(regsub_switch) @attribute
+;(regsub
+;    pattern: (_) @string.regex
+;    substitution: (_) @string.regex)
+
+;; Built-in commands
+"proc" @function.builtin @keyword.function @keyword
+;(namespace . (_) @string ) @function.builtin @keyword.function @keyword
+(namespace . (word_list . (_) @string) @keyword ) @function.builtin @keyword.function @keyword
+
+
 (command
-  name: (simple_word) @function.builtin @function
+  name: (simple_word) @function.builtin @keyword.function @keyword
   (#any-of? @function.builtin
    "cd"
    "exec"
@@ -71,71 +87,86 @@
    "regsub"
    "split"
    "subst"
+   "source"
+   "namespace"
    "trace"
-   "source"))
+   "zipfs"
+   "append"
+   "break"
+   "catch"
+   "continue"
+   "default"
+   "dict"
+   "error"
+   "eval"
+   "global"
+   "lappend"
+   "lassign"
+   "lindex"
+   "linsert"
+   "list"
+   "llength"
+   "lmap"
+   "lrange"
+   "lrepeat"
+   "lreplace"
+   "lreverse"
+   "lsearch"
+   "lset"
+   "lsort"
+   "on"
+   "package"
+   "unset"
+   "variable"))
 
 ; Highlight unset and variable arguments as variables
-(command
-    name: (simple_word) @keyword
-    arguments: (word_list) @variable
-    (#any-of? @keyword
-        "unset"
-        "variable"))
+(set (id) @variable) @function.builtin @keyword.function @keyword
+;(command
+;    name: (simple_word) @function.builtin @keyword.function @keyword
+;    arguments: (word_list) @variable
+;    (#any-of? @keyword
+;        "unset"
+;        "variable"))
 
-(command name: (simple_word) @keyword
-         (#any-of? @keyword
-          "append"
+;; Commands that are keywords, like return
+(command name: (simple_word) @operator
+         (#any-of? @operator
           "break"
           "catch"
           "continue"
           "default"
-          "dict"
           "error"
-          "eval"
-          "global"
-          "lappend"
-          "lassign"
-          "lindex"
-          "linsert"
-          "list"
-          "llength"
-          "lmap"
-          "lrange"
-          "lrepeat"
-          "lreplace"
-          "lreverse"
-          "lsearch"
-          "lset"
-          "lsort"
-          "package"
+          "on"
           "return"
+          "throw"
+          "try"
           "trap"
-          "throw"))
+          "finally"))
 
-[
- "catch"
- "error"
- "global"
- "namespace"
- "on"
- "set"
- "try"
- "finally"
- ] @keyword
-
+;; {*} unpack
 (unpack) @operator
 
+;; Loops or keyword
 [
  "while"
  "foreach"
- ; "for"
  ] @repeat @keyword
 
-[
- "if"
- "else"
- "elseif"
- ] @conditional @keyword
+;; Conditionals
+(command
+    name: (simple_word) @conditional @keyword
+    (#any-of? @conditional
+        "if"
+        "else"
+        "elseif"))
+
+(if .(_)) @conditional @keyword
+
+;[
+; "if"
+; "else"
+; "elseif"
+; ] @conditional @keyword
 
 [
  "**"
@@ -152,21 +183,34 @@
  "||"
  ] @operator
 
-(variable_substitution) @variable
+
+
+;; Removed {} from punctuation, conflicts with variable substitution
+[
+ ;;"{" "}"
+ "[" "]"
+ ] @punctuation.bracket @punctuation.delimiter
+[
+ ";"
+ ] @punctuation.delimiter
+
+;((simple_word)   @punctuation.delimiter
+;    (#match? @punctuation.delimiter
+;        "\\{\\s")
+;)
+;((simple_word)   @punctuation.delimiter
+;    (#match? @punctuation.delimiter
+;        "\\s}\\s")
+;)
+
+(variable_substitution) @variable.special
 (quoted_word) @string
 (escaped_character) @string.escape
 
-[
- "{" "}"
- "[" "]"
- ";"
- ] @punctuation.bracket @punctuation.delimiter
-
 (number) @number
-
 ((simple_word) @number
-               (#match? @number
-                   "^[0-9]+$|^[+-]?[0-9]+$"))
+    (#match? @number
+        "^(?:\\+|-)?[0-9\\.]+$"))
 
 
 ((simple_word) @boolean
@@ -192,7 +236,13 @@
     name: (simple_word) @keyword
     arguments: (word_list
                 (simple_word) @string
-                (#eq? @string "require")    )
+                (#any-of? @string
+                    "require"
+                    "provide"
+                    "ifneeded")    )
   ;      (simple_word) @string
   ;      (#eq? @keyword "require")
     (#eq? @keyword "package"))
+
+;(namespace . (word_list . (_)) @string) @keyword
+;(namespace) @keyword
