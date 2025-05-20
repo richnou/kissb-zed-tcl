@@ -1,4 +1,4 @@
 name = "TCL"
 grammar = "tcl"
-path_suffixes = ["tcl","kb"]
-line_comments = ["# ","#"]
+path_suffixes = ["tcl", "tm"]
+line_comments = ["# ", "#"]
