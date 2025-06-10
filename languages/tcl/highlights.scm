@@ -1,15 +1,14 @@
 
+
+
+
+
+
 ; These rules imported from tree sitter project and improved upon
-
-(comment) @comment
-(number) @number
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (comment) @spell @comment
 (command name: (simple_word) @function)
-
-
 
 (procedure
     name: (_) @function
@@ -70,7 +69,12 @@
 ;; Built-in commands
 "proc" @function.builtin @keyword.function @keyword
 ;(namespace . (_) @string ) @function.builtin @keyword.function @keyword
-(namespace . (word_list . (_) @string) @keyword ) @function.builtin @keyword.function @keyword
+;(namespace . (word_list . (_) @string) @keyword ) @function.builtin @keyword.function @keyword
+(namespace .
+    (word_list .
+        (simple_word) @string
+        (simple_word) @operator
+    ) @keyword ) @function.builtin @keyword.function @keyword
 
 
 (command
@@ -185,25 +189,11 @@
 
 
 
-;; Removed {} from punctuation, conflicts with variable substitution
-[
- ;;"{" "}"
- "[" "]"
- ] @punctuation.bracket @punctuation.delimiter
-[
- ";"
- ] @punctuation.delimiter
-
-;((simple_word)   @punctuation.delimiter
-;    (#match? @punctuation.delimiter
-;        "\\{\\s")
-;)
-;((simple_word)   @punctuation.delimiter
-;    (#match? @punctuation.delimiter
-;        "\\s}\\s")
-;)
 
 (variable_substitution) @variable.special
+(#set! "priority" 100)
+["{" "}"] @variable.special
+
 (quoted_word) @string
 (escaped_character) @string.escape
 
@@ -212,9 +202,33 @@
     (#match? @number
         "^(?:\\+|-)?[0-9\\.]+$"))
 
-
 ((simple_word) @boolean
-               (#any-of? @boolean "true" "false"))
+        (#any-of? @boolean "true" "false"))
+
+
+
+;; Removed {} from punctuation, conflicts with variable substitution
+[
+ ;;"{" "}"
+ "[" "]"
+ ] @punctuation.bracket @punctuation.delimiter
+[
+ ;"{" "}"
+ ";"
+ ] @punctuation.special
+(#set! "priority" 50)
+
+
+
+
+;((simple_word)   @punctuation.special
+    ;(#match? @punctuation.special
+    ;        "\\{\\s")
+;)
+;((simple_word)   @punctuation.delimiter
+    ;(#match? @punctuation.delimiter
+    ;        "\\s}\\s")
+;)
 
 ; after apply array auto_execok auto_import auto_load auto_mkindex auto_qualify
 ; auto_reset bgerror binary chan clock close coroutine dde encoding eof fblocked
@@ -243,6 +257,3 @@
   ;      (simple_word) @string
   ;      (#eq? @keyword "require")
     (#eq? @keyword "package"))
-
-;(namespace . (word_list . (_)) @string) @keyword
-;(namespace) @keyword
