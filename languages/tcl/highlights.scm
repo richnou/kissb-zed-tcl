@@ -67,7 +67,12 @@
 ;    substitution: (_) @string.regex)
 
 ;; Built-in commands
+; ;;;;;;;;;;;;;;;;;;;
+
+; Proc
 "proc" @function.builtin @keyword.function @keyword
+
+; Namespace, highlight second argument of namespace, like eval
 ;(namespace . (_) @string ) @function.builtin @keyword.function @keyword
 ;(namespace . (word_list . (_) @string) @keyword ) @function.builtin @keyword.function @keyword
 (namespace .
@@ -76,18 +81,32 @@
         (simple_word) @operator
     ) @keyword ) @function.builtin @keyword.function @keyword
 
+; Regexp
+;(regexp .) @function.builtin @keyword.function @keyword
 
+; Other standard TCL  commands
+; Some are parsed as command by grammar, some have their dedicated node
+; The ones whith dedicated node are not caught by the (command ) below, they are added manually as pure string match
+
+
+"regexp" @function.builtin @keyword.function @keyword
+
+
+; Generic TCL commands highlighted as keywords
 (command
   name: (simple_word) @function.builtin @keyword.function @keyword
   (#any-of? @function.builtin
+   "after"
+   "apply"
    "cd"
+   "coroinject"
+   "coroutine"
    "exec"
    "exit"
    "incr"
    "info"
    "join"
    "puts"
-   "regexp"
    "regsub"
    "split"
    "subst"
@@ -98,12 +117,10 @@
    "append"
    "break"
    "catch"
-   "continue"
-   "default"
    "dict"
-   "error"
    "eval"
    "global"
+   "load"
    "lappend"
    "lassign"
    "lindex"
@@ -125,6 +142,7 @@
 
 ; Highlight unset and variable arguments as variables
 (set (id) @variable) @function.builtin @keyword.function @keyword
+
 ;(command
 ;    name: (simple_word) @function.builtin @keyword.function @keyword
 ;    arguments: (word_list) @variable
@@ -132,9 +150,43 @@
 ;        "unset"
 ;        "variable"))
 
-;; Commands that are keywords, like return
+
+;; Highlight string as core tcl command, and the second argument of string to better see the string subcommand in use
+;;;;;;;;
+(command
+    name: (simple_word) @keyword
+    arguments: (word_list
+                (simple_word) @string
+                (#any-of? @string
+                    "cat"
+                    "compare"
+                    "equal"
+                    "first"
+                    "index"
+                    "insert"
+                    "is"
+                    "last"
+                    "length"
+                    "map"
+                    "match"
+                    "range"
+                    "repeat"
+                    "replace"
+                    "reverse"
+                    "tolower"
+                    "totitle"
+                    "toupper"
+                    "trim"
+                    "trimleft"
+                    "trimright")    )
+    (#eq? @keyword "string"))
+
+;; Commands that are operators, like return
+;; This rules make these commands highlighted differently than custom commands for better readability
 (command name: (simple_word) @operator
          (#any-of? @operator
+          "global"
+          "upvar"
           "break"
           "catch"
           "continue"
@@ -146,6 +198,11 @@
           "try"
           "trap"
           "finally"))
+
+(try )  @operator
+(global )  @operator
+
+;"try" @operator
 
 ;; {*} unpack
 (unpack) @operator
@@ -189,7 +246,8 @@
 
 
 
-
+;; Variable subst. Added {} to same color as substitution to keep the same color to ${var} syntax characters
+;; This is a tweak, maybe not desired by everyone
 (variable_substitution) @variable.special
 (#set! "priority" 100)
 ["{" "}"] @variable.special
@@ -254,6 +312,4 @@
                     "require"
                     "provide"
                     "ifneeded")    )
-  ;      (simple_word) @string
-  ;      (#eq? @keyword "require")
     (#eq? @keyword "package"))
