@@ -7,5 +7,7 @@ description = "An Extension providing TCL Language highlighting"
 repository = "https://github.com/richnou/kissb-zed-tcl"
 
 [grammars.tcl]
-repository = "https://github.com/tree-sitter-grammars/tree-sitter-tcl"
-rev = "8f11ac7206a54ed11210491cee1e0657e2962c47"
+#repository = "https://github.com/tree-sitter-grammars/tree-sitter-tcl"
+#rev = "8f11ac7206a54ed11210491cee1e0657e2962c47"
+repository = "https://github.com/richnou/tree-sitter-tcl"
+rev = "355dc09d978186c80b13f42b52cbee11355117c2"

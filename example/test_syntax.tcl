@@ -62,6 +62,14 @@ proc definedCommand2 {test {d ""} args} {
 
 definedCommand2 [definedCommand 2]
 
+definedCommand2 [definedCommand [definedCommand 1]]
+
+# examples from @Nindaleth
+[list message [list severity INFO] {stream {}}]
+list message [list severity INFO] {stream {}}
+
+puts "test"
+
 ## Namespace
 ###########
 namespace eval test {
@@ -137,3 +145,96 @@ proc traceCmd args {
 }
 
 trace add variable test read traceCmd
+
+
+###################
+## Some other tests identified as potential issues
+######################
+
+
+## From Issue 1 @Nindaleth
+###############
+
+namespace eval test {
+    # Comment
+}
+
+proc myproc args {
+    # Comment
+}
+
+# @brief do something
+proc sth { param } {
+
+  set val "ddd"
+
+  puts "[string repeat { # } $param ]" ; #test
+  puts "### $headline ###"
+  puts "[string repeat { # } $param ]"
+}
+
+puts "Another line to test"
+
+# end of sth
+
+
+proc ftp_download { aasrc aadst } {
+    puts "$tid: TEST: '$aasrc' '$aadst'"
+
+    foreach src $aasrc dst $aadst {
+        set src2 $src
+        set dst2 $dst
+        log_trace "${tid}($l_sid): src: '$src' / '$src2' "
+        set src3 $src2
+        set dst3 $dst2
+        if { 0 < [ string length $dst3 ] } {
+            append dst3 "/"
+        }
+    }
+    return $dst3
+}
+
+proc log0  {message stream} {
+
+  puts "$severity: ($stream) $message"
+
+  return 0
+
+}
+
+proc foo [list a b c] {
+    # Test
+    puts "hello"
+    echo "word$hi \$bye word"
+}
+
+proc log1 [list message [list severity INFO] {stream {}}] {
+
+  puts "$severity: ($stream) $message"
+
+  return 0
+
+}
+
+proc log2 [list message [list severity $g_severities(INFO)] {stream {}}] {
+
+  puts "$severity: ($stream) $message"
+
+  return 0
+}
+
+proc log3 { message { severity INFO } { stream {} } } {
+
+  puts "$severity: ($stream) $message"
+
+  return 0
+}
+
+global var1
+global var2
+global env
+
+global argc
+global argv
+global argv0
+global var3

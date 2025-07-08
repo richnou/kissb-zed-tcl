@@ -7,8 +7,12 @@
 ; These rules imported from tree sitter project and improved upon
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(comment) @spell @comment
+
+(comment)  @comment
+;(#set! "priority" 0)
+
 (command name: (simple_word) @function)
+(command_nocomment name: (simple_word) @function)
 
 (procedure
     name: (_) @function
