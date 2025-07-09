@@ -16,7 +16,7 @@
 
 (procedure
     name: (_) @function
-)
+) @function.builtin @keyword.function @keyword
 
 ;(namespace) @keyword
 ;(namespace . (word_list) @keyword)
@@ -51,17 +51,9 @@
                 "tcl_wordchars"
                 "tcl_version"))
 
-"expr" @function.builtin @function
+;"expr" @function.builtin @function
 
-; Highlight switch arguments as string
-(command
-    name: (simple_word) @keyword
-    arguments:
-        (word_list
-            (braced_word
-                (command
-                    name: (simple_word) @string)))
-    (#eq? @keyword "switch"))
+
 
 ;("regsub" @function.builtin @function)
 
@@ -74,7 +66,7 @@
 ; ;;;;;;;;;;;;;;;;;;;
 
 ; Proc
-"proc" @function.builtin @keyword.function @keyword
+;"proc" @function.builtin @keyword.function @keyword
 
 ; Namespace, highlight second argument of namespace, like eval
 ;(namespace . (_) @string ) @function.builtin @keyword.function @keyword
@@ -107,6 +99,7 @@
    "coroutine"
    "exec"
    "exit"
+   "foreach"
    "incr"
    "info"
    "join"
@@ -142,10 +135,23 @@
    "on"
    "package"
    "unset"
-   "variable"))
+   "variable"
+   "while"))
 
 ; Highlight unset and variable arguments as variables
 (set (id) @variable) @function.builtin @keyword.function @keyword
+
+
+; Highlight switch arguments as string
+(command
+    name: (simple_word) @function.builtin @keyword.function @keyword
+    arguments:
+        (word_list
+            (braced_word
+                (command
+                    name: (simple_word) @string)))
+    (#eq? @function.builtin "switch"))
+(#set! "priority" 100)
 
 ;(command
 ;    name: (simple_word) @function.builtin @keyword.function @keyword
@@ -203,8 +209,8 @@
           "trap"
           "finally"))
 
-(try )  @operator
-(global )  @operator
+;(try )  @operator
+;(global )  @operator
 
 ;"try" @operator
 
@@ -212,10 +218,10 @@
 (unpack) @operator
 
 ;; Loops or keyword
-[
- "while"
- "foreach"
- ] @repeat @keyword
+;[
+; "while"
+; "foreach"
+; ] @repeat @keyword
 
 ;; Conditionals
 (command
@@ -225,7 +231,14 @@
         "else"
         "elseif"))
 
-(if .(_)) @conditional @keyword
+(simple_word
+  (#any-of? @conditional
+      "if"
+      "else"
+      "elseif")
+) @conditional @keyword
+
+;(if .(_)) @conditional @keyword
 
 ;[
 ; "if"

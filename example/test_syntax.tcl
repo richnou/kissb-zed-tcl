@@ -44,6 +44,10 @@ foreach i {0 1 2} {
     }
 }
 
+while {true} {
+    puts "Oops"
+}
+
 
 
 call.command arguments
@@ -64,8 +68,24 @@ definedCommand2 [definedCommand 2]
 
 definedCommand2 [definedCommand [definedCommand 1]]
 
+proc cmdWithbody args {
+    eval $args
+}
+
+cmdWithBody {
+
+    if {![file exists $path]} {
+        log.warn "$path doesn't not exist"
+    }
+}
+
+cmd_send {
+    if $element() has "," then user = $element()
+} $node
+
+
 # examples from @Nindaleth
-[list message [list severity INFO] {stream {}}]
+[list message [list severity INFO] {stream {} #tt }]
 list message [list severity INFO] {stream {}}
 
 puts "test"
@@ -73,6 +93,8 @@ puts "test"
 ## Namespace
 ###########
 namespace eval test {
+
+    # Comment
 
     variable myvar  10
     set anothervar "foo"
@@ -100,11 +122,11 @@ try {
 
     set f [open /some/file/name r]
 
-} trap {POSIX EISDIR} {} {
+} trap {POSIX EISDIR} args {
 
     puts "failed to open /some/file/name: it's a directory"
 
-} trap {POSIX ENOENT} {} {
+} trap {POSIX ENOENT} args {
 
     puts "failed to open /some/file/name: it doesn't exist"
 
@@ -194,18 +216,56 @@ proc ftp_download { aasrc aadst } {
     return $dst3
 }
 
+proc ftp_download {} {
+
+    set var1 "-"
+    set var2 "-"
+    set var3 "-"
+
+    log_trace "${tid}($l_sid): src: '$src' / '$src2'"
+
+}
+
+
+proc test args {
+
+foreach  src $aasrc dst $aadst  {
+
+    set src2 $src
+    set dst2 $dst
+
+    puts $i
+}
+
+}
+
+proc ftp_download { } {
+
+    set var1 ""
+    set var2 ""
+    set var3 ""
+
+
+
+    foreach src $aasrc dst $aadst {
+        set src2 $src
+        set dst2 $dst
+        log_trace "${tid}($l_sid): src: '$src' / '$src2'"
+        set src3 $src2
+        set dst3 $dst2
+        if { 0 < [ string length $dst3 ] } {
+            append dst3 "/"
+        }
+    }
+    return $dst3
+}
+
 proc log0  {message stream} {
 
   puts "$severity: ($stream) $message"
 
   return 0
 
-}
-
-proc foo [list a b c] {
-    # Test
-    puts "hello"
-    echo "word$hi \$bye word"
 }
 
 proc log1 [list message [list severity INFO] {stream {}}] {
@@ -238,3 +298,54 @@ global argc
 global argv
 global argv0
 global var3
+
+
+
+set combinations {
+    [list "test" "test" "allow" "test" 1]
+    [list "test" "test" "deny" "test" 1]
+    [list "test" "test" "allow" "test2" 1]
+    [list "test2" "test2" "deny" "test2" 1]
+}
+set combinations2 $combinations
+
+foreach { message patterns decision reason weight } $combinations [list message2 patterns2 decision2 reason2 weight2] $combinations2 {
+    puts "message = $message, patterns = $patterns, decision = $decision, reason = $reason, weight = $weight"
+    puts "message2 = $message2, patterns2 = $patterns2, decision2 = $decision2, reason2 = $reason2, weight2 = $weight2"
+
+}
+
+proc helper {arg1 arg2} {
+  set result 0
+
+  if {[string compare $arg1 {}]} {
+    switch -- $arg2 {
+
+
+      while  {set bool ""}
+      if      {}
+      default {return}
+    }
+  }
+
+  return $result
+}
+
+proc quad_quotes { line } {
+  set retval ""
+
+  set line [regsub -all { \" } $line {""}]
+  log_trace "${tid}: double-double quoted '$line'"
+  set retval $line
+
+  return $retval
+}
+
+
+
+proc do_send { { node "" } } {
+  set var1 "value1"
+  cmd_send {if $element() has "," then user = $element()} $node
+  set var2 "value2"
+  return
+}
